@@ -1,5 +1,7 @@
 package controller;
 
+import java.util.Optional;
+
 import exception.RouteDupulicatedException;
 import exception.RouteNameNotFoundException;
 import exception.SinglePathwayException;
@@ -13,6 +15,7 @@ import view.EndView;
 
 public class ProjectMapController {
 
+
 	private static ProjectMapController instance = new ProjectMapController();
 	private ProjectMapController() {}
 	public static ProjectMapController getInstance() {
@@ -23,7 +26,7 @@ public class ProjectMapController {
 	
 	
 	
-	/* °Ë»ö ¹× ¹İÈ¯ ¸Ş¼Òµå */
+	/* ê²€ìƒ‰ ë° ë°˜í™˜ ë©”ì†Œë“œ */
 	
 	public void getRouteList() {
 		EndView.routeListView(service.getRouteList());
@@ -36,7 +39,7 @@ public class ProjectMapController {
 			EndView.routeView(service.getRoute(routeName));
 		} catch(RouteNameNotFoundException e) {
 			e.printStackTrace();
-			EndFailView.failView("ÇØ´ç Route¸¦ Ã£Áö ¸øÇß½À´Ï´Ù.");
+			EndFailView.failView("í•´ë‹¹ Routeë¥¼ ì°¾ì§€ ëª»í–ˆìŠµë‹ˆë‹¤.");
 		}
 	}
 	
@@ -47,103 +50,111 @@ public class ProjectMapController {
 			EndView.transportationView(service.getTransportation(transportationId));
 		} catch(TransportationNotFoundException e) {
 			e.printStackTrace();
-			EndFailView.failView("ÇØ´ç ±³Åë¼ö´ÜÀ» Ã£Áö ¸øÇß½À´Ï´Ù.");
+			EndFailView.failView("í•´ë‹¹ êµí†µìˆ˜ë‹¨ì„ ì°¾ì§€ ëª»í–ˆìŠµë‹ˆë‹¤.");
 		}
 	}
 	
 	
 	
 	
-	/* Ãß°¡ ¸Ş¼Òµå */
+	/* ì¶”ê°€ ë©”ì†Œë“œ */
 	
 	public void transportationInsert(Transportation newTransportation) {
+		Optional<Transportation> opt = Optional.ofNullable(newTransportation);
 		
-		if (newTransportation != null ) {
+		opt.ifPresentOrElse(data -> {
 			try {
-				service.transportationInsert(newTransportation);
+				service.transportationInsert(data);
 			} catch(TransportationDupulicatedException e) {
 				e.printStackTrace();
 				EndFailView.failView(e.getMessage());
 			}
-		}else {
-			System.out.println("Ãß°¡ÇÏ·Á´Â ±³Åë¼ö´Ü Á¤º¸¸¦ Á¦´ë·Î ÀÔ·ÂÇÏ¼¼¿ä.");
-		}
+		}, () -> {
+			System.out.println("ì¶”ê°€í•˜ë ¤ëŠ” êµí†µìˆ˜ë‹¨ ì •ë³´ë¥¼ ì œëŒ€ë¡œ ì…ë ¥í•˜ì„¸ìš”.");
+		});
 	}
 	
 	
 	public void routeInsert(Route newRoute) {
+		Optional<Route> opt = Optional.ofNullable(newRoute);
 		
-		if (newRoute != null ) {
+		opt.ifPresentOrElse(data -> {
 			try {
-				service.routeInsert(newRoute);
+				service.routeInsert(data);
 			} catch(RouteDupulicatedException e) {
 				e.printStackTrace();
 				EndFailView.failView(e.getMessage());
 			}
-		}else {
-			System.out.println("Ãß°¡ÇÏ·Á´Â Route Á¤º¸¸¦ Á¦´ë·Î ÀÔ·ÂÇÏ¼¼¿ä.");
-		}
+		}, () -> {
+			System.out.println("ì¶”ê°€í•˜ë ¤ëŠ” Route ì •ë³´ë¥¼ ì œëŒ€ë¡œ ì…ë ¥í•˜ì„¸ìš”.");
+		});
 	}
 	
 	
 	
 	
-	/* ¼öÁ¤ ¸Ş¼Òµå, Controller¿¡¼­ ¹İÈ¯ Ãß°¡ */
+	/* ìˆ˜ì • ë©”ì†Œë“œ, Controllerì—ì„œ ë°˜í™˜ ì¶”ê°€ */
 	
 	public void routeABUpdate(String routeName, Object newTransportation) {
+		Optional<String> optName = Optional.ofNullable(routeName);
+		Optional<Object> optT = Optional.ofNullable(newTransportation);
 		
-		if (routeName != null && newTransportation != null) {
+		if (optName.isPresent() && optT.isPresent()) {
 			try {
 				service.routeABUpdate(routeName, newTransportation);
-				EndView.successView(routeName + "ÀÇ AB ±¸°£ ±³Åë¼ö´Ü ¼öÁ¤ÀÌ ¿Ï·áµÇ¾ú½À´Ï´Ù."); 
-				System.out.println("¼öÁ¤µÈ Route Á¤º¸ : ");
+				EndView.successView(routeName + "ì˜ AB êµ¬ê°„ êµí†µìˆ˜ë‹¨ ìˆ˜ì •ì´ ì™„ë£Œë˜ì—ˆìŠµë‹ˆë‹¤."); 
+				System.out.println("ìˆ˜ì •ëœ Route ì •ë³´ : ");
 				getRoute(routeName);
 			} catch(SinglePathwayException e) {
 				e.printStackTrace();
-				EndFailView.failView("AB ±¸°£ÀÇ ±³Åë¼ö´ÜÀ» ¼öÁ¤ÇÒ ¼ö ¾ø´Â SingleRoute ÀÔ´Ï´Ù.");
+				EndFailView.failView("AB êµ¬ê°„ì˜ êµí†µìˆ˜ë‹¨ì„ ìˆ˜ì •í•  ìˆ˜ ì—†ëŠ” SingleRoute ì…ë‹ˆë‹¤.");
 			}
 		}else {
-			System.out.println("¼öÁ¤ Á¤º¸¸¦ Á¦´ë·Î ÀÔ·ÂÇÏ¼¼¿ä.");
+			System.out.println("ìˆ˜ì • ì •ë³´ë¥¼ ì œëŒ€ë¡œ ì…ë ¥í•˜ì„¸ìš”.");
 		}
 	}
 	
 	
 	public void priceABUpdate(String transportationId, int newPrice) {
+		Optional<String> optId = Optional.ofNullable(transportationId);
+		Optional<Integer> optPrice = Optional.ofNullable(newPrice);
 		
-		if (transportationId != null && newPrice != 0) {
+		if (optId.isPresent() && optPrice.isPresent()) {
 			try {
 				service.priceABUpdate(transportationId, newPrice);
-				EndView.successView(transportationId + "ÀÇ AB ±¸°£ ¿ä±İ ¼öÁ¤ÀÌ ¿Ï·áµÇ¾ú½À´Ï´Ù.");
-				System.out.println("¼öÁ¤µÈ ±³Åë¼ö´Ü Á¤º¸ : ");
+				EndView.successView(transportationId + "ì˜ AB êµ¬ê°„ ìš”ê¸ˆ ìˆ˜ì •ì´ ì™„ë£Œë˜ì—ˆìŠµë‹ˆë‹¤.");
+				System.out.println("ìˆ˜ì •ëœ êµí†µìˆ˜ë‹¨ ì •ë³´ : ");
 				getTransportation(transportationId);
 			} catch(TransportationNotFoundException e) {
 				e.printStackTrace();
-				EndFailView.failView("¼öÁ¤ÇÏ°íÀÚ ÇÏ´Â ±³Åë¼ö´ÜÀ» Ã£Áö ¸øÇß½À´Ï´Ù.");
+				EndFailView.failView("ìˆ˜ì •í•˜ê³ ì í•˜ëŠ” êµí†µìˆ˜ë‹¨ì„ ì°¾ì§€ ëª»í–ˆìŠµë‹ˆë‹¤.");
 			}
 		}else {
-			EndFailView.failView("¼öÁ¤ÇÒ ¿ä±İ°ú ±³Åë¼ö´ÜÀÇ Á¤º¸¸¦ Á¦´ë·Î ÀÔ·ÂÇÏ¼¼¿ä.");
+			EndFailView.failView("ìˆ˜ì •í•  ìš”ê¸ˆê³¼ êµí†µìˆ˜ë‹¨ì˜ ì •ë³´ë¥¼ ì œëŒ€ë¡œ ì…ë ¥í•˜ì„¸ìš”.");
 		}
 	}
 	
 	
 	
 	
-	/* »èÁ¦ ¸Ş¼Òµå */
+	/* ì‚­ì œ ë©”ì†Œë“œ */
 	
 	public void routeDelete(String routeName) {
+		Optional<String> opt = Optional.ofNullable(routeName);
 		boolean result = service.routeDelete(routeName);
 		
-		if (routeName != null) {
+		opt.ifPresentOrElse(data -> {
 			if (result) {
-				EndView.successView(routeName + "»èÁ¦°¡ ¿Ï·áµÇ¾ú½À´Ï´Ù.");
+				EndView.successView(routeName + "ì‚­ì œê°€ ì™„ë£Œë˜ì—ˆìŠµë‹ˆë‹¤.");
 			}else {
-				EndFailView.failView("»èÁ¦ÇÒ Route¸¦ Ã£Áö ¸øÇß½À´Ï´Ù.");
+				EndFailView.failView("ì‚­ì œí•  Routeë¥¼ ì°¾ì§€ ëª»í–ˆìŠµë‹ˆë‹¤.");
 			}
-		}else {
-			EndFailView.failView("»èÁ¦ÇÒ Route ÀÌ¸§À» Á¦´ë·Î ÀÔ·ÂÇÏ¼¼¿ä.");
-		}
+		}, () -> {
+			EndFailView.failView("ì‚­ì œí•  Route ì´ë¦„ì„ ì œëŒ€ë¡œ ì…ë ¥í•˜ì„¸ìš”.");
+		});
 	}
 	
 	
 	
 }
+
