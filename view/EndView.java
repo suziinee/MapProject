@@ -1,47 +1,58 @@
 package view;
 
 import java.util.ArrayList;
+import java.util.Optional;
 
 import model.dto.Route;
 
 public class EndView {
 
-	//RouteList Ãâ·Â
+	
+	/* RouteList ì¶œë ¥ */
 	public static void routeListView(ArrayList<Route> routeList) {
 		
-		if (routeList != null) {
-			int count = routeList.size();
-			for (int i = 0; i < count; i++) {
-				if (routeList.get(i) != null) {
-					System.out.println(routeList.get(i));
-				} 
-			}
+		Optional<Object> opt = Optional.ofNullable(routeList);
+		
+		if (opt.isPresent()) {
+			routeList.stream().forEach(r -> 
+					System.out.println(r));
 		}else {
-			System.out.println("RouteList°¡ ¾ø½À´Ï´Ù.");
+			System.out.println("RouteListê°€ ì—†ìŠµë‹ˆë‹¤.");
 		}
 	}
 	
-	//Route Ãâ·Â
+	
+
+
+	/* Route ì¶œë ¥ */
 	public static void routeView(Route r) {
+		Optional<Route> opt = Optional.ofNullable(r);
 		
-		if (r != null) {
-			System.out.println(r);
-		}else {
-			System.out.println("ÇØ´ç Route´Â Á¸ÀçÇÏÁö ¾Ê½À´Ï´Ù.");
-		}
+		opt.ifPresentOrElse(data -> {
+			System.out.println(data);
+		}, () -> {
+			System.out.println("í•´ë‹¹ RouteëŠ” ì¡´ì¬í•˜ì§€ ì•ŠìŠµë‹ˆë‹¤.");
+		});
 	}
 	
-	//Transportation Ãâ·Â
+	
+	
+
+	/* Transportation ì¶œë ¥ */
 	public static void transportationView(Object o) {
+		Optional<Object> opt = Optional.ofNullable(o);
 		
-		if (o != null) {
+		opt.ifPresentOrElse(data -> {
 			System.out.println(o);
-		}else {
-			System.out.println("ÇØ´ç ±³Åë¼ö´ÜÀº Á¸ÀçÇÏÁö ¾Ê½À´Ï´Ù.");
-		}
+		}, () -> {
+			System.out.println("í•´ë‹¹ êµí†µìˆ˜ë‹¨ì€ ì¡´ì¬í•˜ì§€ ì•ŠìŠµë‹ˆë‹¤.");
+		});
 	}
 	
-	//¼º°ø ¸Ş¼¼Áö Ãâ·Â
+	
+	
+	
+	/* ì„±ê³µ ë©”ì„¸ì§€ ì¶œë ¥ */
 	public static void successView(String s) {
 		System.out.println(s);
 	}
