@@ -1,19 +1,19 @@
 package service;
 
 import java.util.ArrayList;
+import java.util.Optional;
 
 import exception.RouteDupulicatedException;
 import exception.RouteNameNotFoundException;
 import exception.SinglePathwayException;
 import exception.TransportationDupulicatedException;
 import exception.TransportationNotFoundException;
-import model.dto.Bus;
 import model.dto.Route;
-import model.dto.Subway;
 import model.dto.Transportation;
 import view.EndFailView;
 
 public class ProjectMapService {
+
 
 	private static ProjectMapService instance = new ProjectMapService();
 	private ProjectMapService() {}
@@ -24,7 +24,7 @@ public class ProjectMapService {
 	
 	
 	
-	/* ÀúÀå ¹è¿­ »ı¼º */
+	/* ì €ì¥ ë°°ì—´ ìƒì„± */
 	
 	private ArrayList<Route> routeList = new ArrayList<Route>();
 	private ArrayList<Transportation> transportationList = new ArrayList<Transportation>();
@@ -32,7 +32,7 @@ public class ProjectMapService {
 	
 	
 	
-	/* °Ë»ö ¹× ¹İÈ¯ ¸Ş¼Òµå */
+	/* ê²€ìƒ‰ ë° ë°˜í™˜ ë©”ì†Œë“œ */
 	
 	public ArrayList<Route> getRouteList() {
 		return routeList;
@@ -42,10 +42,11 @@ public class ProjectMapService {
 	public Route getRoute(String routeName) 
 		throws RouteNameNotFoundException {
 		
-		for (Route r : routeList) {
-			if (routeName.equals(r.getName())) {
-				return r;
-			}
+		Optional<Route> opt = routeList.stream().filter(r -> 
+				r.getName().equals(routeName)).findAny();
+		
+		if (opt.isPresent()) {
+			return opt.get();
 		}
 		throw new RouteNameNotFoundException();
 	}
@@ -54,10 +55,11 @@ public class ProjectMapService {
 	public Transportation getTransportation(String transportationId) 
 		throws TransportationNotFoundException {
 		
-		for (Transportation t : transportationList) {
-			if (transportationId.equals(t.getId())) {
-				return t;
-			}
+		Optional<Transportation> opt = transportationList.stream().filter(t -> 
+				t.getId().equals(transportationId)).findAny();
+		
+		if (opt.isPresent()) {
+			return opt.get();
 		}
 		throw new TransportationNotFoundException();
 	}
@@ -65,15 +67,16 @@ public class ProjectMapService {
 	
 	
 	
-	/* Ãß°¡ ¸Ş¼Òµå */
+	/* ì¶”ê°€ ë©”ì†Œë“œ */
 	
 	public void transportationInsert(Transportation newTransportation) 
 		throws TransportationDupulicatedException {
 		
-		for (Transportation t : transportationList) {
-			if (newTransportation == t) {
-				throw new TransportationDupulicatedException();
-			}
+		boolean anyMatch = transportationList.stream().anyMatch(t -> 
+				t.getId().equals(newTransportation.getId()));
+		
+		if (anyMatch) {
+			throw new TransportationDupulicatedException();
 		}
 		transportationList.add(newTransportation);
 	}
@@ -82,10 +85,11 @@ public class ProjectMapService {
 	public void routeInsert(Route newRoute) 
 		throws RouteDupulicatedException {
 		
-		for (Route r : routeList) {
-			if (newRoute == r) {
-				throw new RouteDupulicatedException();
-			}
+		boolean anyMatch = routeList.stream().anyMatch(r -> 
+		r.getName().equals(newRoute.getName()));
+		
+		if (anyMatch) {
+			throw new RouteDupulicatedException();
 		}
 		routeList.add(newRoute);
 	}
@@ -93,33 +97,31 @@ public class ProjectMapService {
 	
 	
 	
-	/* ¼öÁ¤ ¸Ş¼Òµå */
+	/* ìˆ˜ì • ë©”ì†Œë“œ */
 	
 	public void routeABUpdate(String routeName, Object newTransportation) 
 		throws SinglePathwayException {
 		
-		for (Route r : routeList) {
-			if (routeName.equals(r.getName())) {
-				if (r.getTransportation() != null) {
-					throw new SinglePathwayException("AºÎÅÍ C±îÁö ÇÑ¹ø¿¡ °¡´Â ·çÆ®ÀÔ´Ï´Ù.");
-				}else {
-					r.setTransportation1(newTransportation);
-					return;
-				}
-			}
+		Optional<Route> opt = routeList.stream().filter(r -> 
+				r.getName().equals(routeName)).findAny();
+		
+		if (opt.isPresent()) {
+			opt.get().setTransportation1(newTransportation);
+			return;
 		}
-		EndFailView.failView("¾÷µ¥ÀÌÆ®ÇÏ·Á´Â ·çÆ®¸¦ Ã£Áö ¸øÇß½À´Ï´Ù.");
+		EndFailView.failView("ì—…ë°ì´íŠ¸í•˜ë ¤ëŠ” ë£¨íŠ¸ë¥¼ ì°¾ì§€ ëª»í–ˆìŠµë‹ˆë‹¤.");
 	}
 	
 	
 	public void priceABUpdate(String transportationId, int newPrice) 
 		throws TransportationNotFoundException {
 		
-		for (Transportation t : transportationList) {
-			if (transportationId.equals(t.getId())) {
-				t.setPriceAB(newPrice);
-				return;
-			}
+		Optional<Transportation> opt = transportationList.stream().filter(t -> 
+		t.getId().equals(transportationId)).findAny();
+
+		if (opt.isPresent()) {
+			opt.get().setPriceAB(newPrice);
+			return;
 		}
 		throw new TransportationNotFoundException();
 	}
@@ -127,16 +129,16 @@ public class ProjectMapService {
 	
 	
 	
-	/* »èÁ¦ ¸Ş¼Òµå */ 
+	/* ì‚­ì œ ë©”ì†Œë“œ */ 
 	
 	public boolean routeDelete(String routeName) {
-		int count = routeList.size();
 		
-		for (int i = 0; i < count; i++) {
-			if (routeName.equals(routeList.get(i).getName())) {
-				routeList.remove(i);
-				return true;
-			}
+		Optional<Route> opt = routeList.stream().filter(r -> 
+			r.getName().equals(routeName)).findAny();
+		
+		if (opt.isPresent()) {
+			routeList.remove(opt.get());
+			return true;
 		}
 		return false;
 	}
