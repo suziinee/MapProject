@@ -11,14 +11,13 @@ public class EndView {
 	/* RouteList 출력 */
 	public static void routeListView(ArrayList<Route> routeList) {
 		
-		Optional<Object> opt = Optional.ofNullable(routeList);
+		Optional<ArrayList<Route>> opt = Optional.ofNullable(routeList);
 		
-		if (opt.isPresent()) {
-			routeList.stream().forEach(r -> 
-					System.out.println(r));
-		}else {
+		opt.ifPresentOrElse(data -> {
+			data.stream().forEach(System.out::println);
+		}, () -> {
 			System.out.println("RouteList가 없습니다.");
-		}
+		});
 	}
 	
 	
@@ -51,7 +50,7 @@ public class EndView {
 	
 	
 	
-	
+
 	/* 성공 메세지 출력 */
 	public static void successView(String s) {
 		System.out.println(s);
